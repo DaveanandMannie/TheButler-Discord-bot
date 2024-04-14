@@ -1,11 +1,13 @@
 import asyncio
+from asyncio import Queue
 import os
+import time
 import discord
 from discord import PCMVolumeTransformer, FFmpegPCMAudio, Embed, Member, VoiceClient
 # from discord.ext import commands
 from discord.ext.commands import Cog, Bot, command
 from discord.ext.commands import Context
-from collections import deque
+# from collections import deque
 
 import yt_dlp
 
@@ -19,6 +21,8 @@ format_options: dict = {
     'quiet': False,
     'no_warnings': False,
     'default_search': 'auto',
+    'throttledratelimit': 300,
+    'ratelimit': 100,
 }
 ffmpeg_options: dict = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5',
@@ -58,13 +62,13 @@ class YTSource(PCMVolumeTransformer):
 class Music(Cog):
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
-        self.queue: deque[YTSource] = deque(maxlen=7)
+        self.queue: Queue = Queue(maxsize=7)
 
     @command(name='add2q', aliases=['add', 'a2q'])
     async def enqueue(self, ctx: Context, url: str) -> None:
         async with ctx.typing():
             player = await YTSource.from_url(ctx, url=url, loop=self.bot.loop, download=False)
-            self.queue.append(player)
+            await self.queue.put(player)
             embed: Embed = Embed(
                 title='Queue: add',
                 description=f'{player.title} added by {player.requester}.\n{player.duration}',
@@ -74,27 +78,31 @@ class Music(Cog):
 
     @command(name='clearq', aliases=['clear', 'deleteall'])
     async def clear_queue(self, ctx: Context) -> None:
-        self.queue.clear()
+        self.queue = Queue(maxsize=7)
         embed: Embed = Embed(title='Queue: cleared', color=discord.Colour.purple())
         await ctx.send(embed=embed)
 
     @command(name='queue', aliases=['q', 'upnext'])
     async def view_queue(self, ctx: Context) -> None:
+        tracks = []
+        while not self.queue.empty():
+            track = await self.queue.get()
+            tracks.append(track)
         description = '\n\n'.join(
             [f'{index + 1} : {track.title} added by {track.requester}. {track.duration}'
-             for index, track in enumerate(self.queue)]
+             for index, track in enumerate(tracks)]
         )
         embed: Embed = Embed(title="Queue", description=description, color=discord.Colour.purple())
         await ctx.send(embed=embed)
 
     @command(name='play')
     async def play(self, ctx: [Context, Context.voice_client]):
-        if len(self.queue) == 0:
+        if self.queue.empty():
             await ctx.send(f'Queue is empty Bozo {ctx.author.mention}')
             await ctx.send('https://tenor.com/byaam.gif')
             await ctx.voice_client.disconnect()
             return
-        track = self.queue.popleft()
+        track = await self.queue.get()
         embed: Embed = Embed(
             title='Now playing',
             description=f'{track.title} added by {track.requester}.\n{track.duration}',
@@ -109,7 +117,7 @@ class Music(Cog):
         if ctx.voice_client is None:
             await ctx.send("I'm not even there bozo\nhttps://tenor.com/bOm6q.gif")
             return
-        if len(self.queue) == 0:
+        if self.queue.empty():
             await ctx.send('Nothing in queue bozo\nhttps://tenor.com/bOm6q.gif')
             return
         ctx.voice_client.stop()
