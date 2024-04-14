@@ -21,7 +21,7 @@ class GamingStack(Cog):
                 await ctx.send(f'User: {member.name} in db already')
             await ctx.send('TASK COMPLETED: Check stdout')
 
-    @command(name='createstack')
+    @command(name='createstack', aliases=['createping'])
     async def create_mention_group(self, ctx: Context, group_name: str) -> None:
         """Creates a stack: value-1 -> stack name"""
         try:
@@ -38,7 +38,7 @@ class GamingStack(Cog):
             await ctx.send(embed=create_stack_embed_error)
             await ctx.send('https://tenor.com/bOm6q.gif')
 
-    @command(name='add2stack')
+    @command(name='add2stack', aliases=['a2s'])
     async def add_to_mention_group(self, ctx: Context, member_namesake: str, stack_name: str) -> None:
         """Adds member to a stack: value-1 -> member OR nickname, value-2 -> stack name"""
         stack_tuple: tuple[int, str] = self.db.get_mention_group_data(name=stack_name)
@@ -71,7 +71,7 @@ class GamingStack(Cog):
                 await ctx.send(embed=failure_embed)
                 await ctx.send('https://tenor.com/bOm6q.gif')
 
-    @command('@')
+    @command(name='@', aliases=['ping'])
     async def ping_stack(self, ctx: Context, stack_name: str) -> None:
         """Pings all members in a stack: value-1 -> stack Name"""
         try:
