@@ -98,10 +98,12 @@ class Music(Cog):
     @command(name='play')
     async def play(self, ctx: [Context, Context.voice_client]):
         if self.queue.empty():
-            await ctx.send(f'Queue is empty Bozo {ctx.author.mention}')
-            await ctx.send('https://tenor.com/byaam.gif')
-            await ctx.voice_client.disconnect()
-            return
+            time.sleep(120)
+            if self.queue.empty():
+                await ctx.send(f'Queue is empty Bozo {ctx.author.mention}')
+                await ctx.send('https://tenor.com/byaam.gif')
+                await ctx.voice_client.disconnect()
+                return
         track = await self.queue.get()
         embed: Embed = Embed(
             title='Now playing',
