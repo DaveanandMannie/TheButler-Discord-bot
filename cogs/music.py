@@ -1,13 +1,10 @@
 import asyncio
 from asyncio import Queue
 import os
-import time
 import discord
 from discord import PCMVolumeTransformer, FFmpegPCMAudio, Embed, Member, VoiceClient
-# from discord.ext import commands
 from discord.ext.commands import Cog, Bot, command
 from discord.ext.commands import Context
-# from collections import deque
 
 import yt_dlp
 
@@ -35,12 +32,12 @@ youtube_dl = yt_dlp.YoutubeDL(format_options)
 class YTSource(PCMVolumeTransformer):
     def __init__(self, source, *, data: dict, requester: Member):
         super().__init__(source)
-        self.data = data
-        self.requester = requester
-        self.title = data.get('title')
-        self.url = data.get('url')
-        self.web_url = data.get('webpage_url')
-        self.duration = self.convert_duration(data.get('duration'))
+        self.data: dict = data
+        self.requester: Member = requester
+        self.title: str = data.get('title')
+        self.url: str = data.get('url')
+        self.web_url: str = data.get('webpage_url')
+        self.duration: str = self.convert_duration(data.get('duration'))
 
     @staticmethod
     def convert_duration(duration: int) -> str:
