@@ -65,22 +65,27 @@ class GamingStack(Cog):
             except sqlite3.IntegrityError:
                 failure_embed: Embed = Embed(
                     title='Yikes',
-                    description=f"{member_tuple[1]} is in the {stack_tuple[1]} stack already",
+                    description=f"{member_tuple[1]} is in the {stack_tuple[1]} stack already bozo",
                     color=discord.Color.purple()
                 )
                 await ctx.send(embed=failure_embed)
+                await ctx.send('https://tenor.com/bOm6q.gif')
 
-# TODO: add check if stack exists
     @command('@')
     async def ping_stack(self, ctx: Context, stack_name: str) -> None:
         """Pings all members in a stack: value-1 -> stack Name"""
-        member_list: list[int] = self.db.get_stack_members(stack_name=stack_name)
-        member: int
-        stack_message: str = ''
-        for member in member_list:
-            stack_message += f'<@!{member}>'
-        ping_embed: Embed = Embed(title=f'Assembling the {stack_name} stack, Ready up!',
-                                  description=stack_message,
-                                  color=discord.Color.purple())
-        await ctx.send(embed=ping_embed)
-        await ctx.send(stack_message)
+        try:
+            member_list: list[int] = self.db.get_stack_members(stack_name=stack_name)
+            member: int
+            stack_message: str = ''
+            for member in member_list:
+                stack_message += f'<@!{member}>'
+            ping_embed: Embed = Embed(title=f'Assembling the {stack_name} stack, Ready up!',
+                                      description=stack_message,
+                                      color=discord.Color.purple())
+            await ctx.send(embed=ping_embed)
+            await ctx.send(stack_message)
+        except Database.StackNotFoundError:
+            error_embed: Embed = Embed(title="That's not a correct stack bozo", color=discord.Color.purple())
+            await ctx.send(embed=error_embed)
+            await ctx.send('https://tenor.com/bOm6q.gif')

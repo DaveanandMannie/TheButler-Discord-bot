@@ -2,6 +2,11 @@ import sqlite3
 import logging
 
 
+class StackNotFoundError(Exception):
+	"""Custom Exception for no stack found"""
+	pass
+
+
 class Manager:
 	def __init__(self, *, database_name: str) -> None:
 		"""Initializes connection with database and creators a cursor"""
@@ -139,7 +144,10 @@ class Manager:
 				''',
 				(stack_name,)
 			)
-			discord_ids = [row[0] for row in self.cursor.fetchall()]
+			rows = self.cursor.fetchall()
+			if not rows:
+				raise StackNotFoundError
+			discord_ids = [row[0] for row in rows]
 			return discord_ids
 		except sqlite3.Error as error:
 			print(error)
