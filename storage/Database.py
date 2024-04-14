@@ -1,7 +1,9 @@
 import sqlite3
 import logging
 
-#TODO: figure out to search based on user name and nick name
+
+# TODO: figure out to search based on user name and nick name
+
 class StackNotFoundError(Exception):
 	"""Custom Exception for no stack found"""
 	pass
