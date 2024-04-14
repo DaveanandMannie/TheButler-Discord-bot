@@ -21,7 +21,7 @@ class GamingStack(Cog):
                 await ctx.send(f'User: {member.name} in db already')
             await ctx.send('TASK COMPLETED: Check stdout')
 
-    @command(name='createstack', aliases=['createping'])
+    @command(name='createstack', aliases=['createping', 'cs'])
     async def create_mention_group(self, ctx: Context, group_name: str) -> None:
         """Creates a stack: value-1 -> stack name"""
         try:
