@@ -40,7 +40,7 @@ class GamingStack(Cog):
 
     @command(name='add2stack', aliases=['a2s'])
     async def add_to_mention_group(self, ctx: Context, member_namesake: str, stack_name: str) -> None:
-        """Adds member to a stack: value-1 -> member OR nickname, value-2 -> stack name"""
+        """stack:value-1:member OR nickname, value-2:stack name"""
         stack_tuple: tuple[int, str] = self.db.get_mention_group_data(name=stack_name)
         member_tuple: tuple[int, str, str, int] = self.db.get_member_data(name=member_namesake)
         if member_tuple is None:
@@ -92,6 +92,7 @@ class GamingStack(Cog):
 
     @command(name='stacks')
     async def get_all_stacks(self, ctx: Context):
+        """Shows all stacks"""
         stack_embed: Embed = Embed(
             title="List of of stacks, personally I think they're all bozos",
             description='\n'.join(self.db.get_mention_names()),

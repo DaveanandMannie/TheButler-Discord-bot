@@ -63,6 +63,7 @@ class Music(Cog):
 
     @command(name='add2q', aliases=['add', 'a2q'])
     async def enqueue(self, ctx: Context, url: str) -> None:
+        """Adds a link to queue or wrap a YouTube search in double quotes"""
         async with ctx.typing():
             player = await YTSource.from_url(ctx, url=url, loop=self.bot.loop, download=False)
             await self.queue.put(player)
@@ -75,12 +76,14 @@ class Music(Cog):
 
     @command(name='clearq', aliases=['clear', 'deleteall'])
     async def clear_queue(self, ctx: Context) -> None:
+        """Deletes entire queue"""
         self.queue = Queue(maxsize=7)
         embed: Embed = Embed(title='Queue: cleared', color=discord.Colour.purple())
         await ctx.send(embed=embed)
 
     @command(name='queue', aliases=['q', 'upnext'])
     async def view_queue(self, ctx: Context) -> None:
+        """Shows entire queue"""
         tracks = []
         while not self.queue.empty():
             track = await self.queue.get()
@@ -94,6 +97,7 @@ class Music(Cog):
 
     @command(name="nowplaying", aliases=['np', 'playing', 'track'])
     async def now_playing(self, ctx: Context):
+        """Shows what is currently playing"""
         np_embed: Embed = Embed(
             title='Now playing',
             description=f'{self.current.title} added by {self.current.requester}.\n{self.current.duration}',
@@ -103,6 +107,7 @@ class Music(Cog):
 
     @command(name='play')
     async def play(self, ctx: [Context, Context.voice_client]):
+        """Plays queue from the start"""
         if self.queue.empty():
             await asyncio.sleep(120)
             if self.queue.empty():
@@ -123,6 +128,7 @@ class Music(Cog):
 
     @command(name='next', aliases=['n', 'skip'])
     async def play_next(self, ctx: [Context, VoiceClient]) -> None:
+        """Skips current song and plays next in queue"""
         if ctx.voice_client is None:
             await ctx.send("I'm not even there bozo\nhttps://tenor.com/bOm6q.gif")
             return
@@ -133,6 +139,7 @@ class Music(Cog):
 
     @command(name='leave')
     async def leave(self, ctx: Context) -> None:
+        """Kicks the Butler out the call"""
         if ctx.voice_client is None:
             await ctx.send(f"I'm not even there bozo {ctx.author.mention}\nhttps://tenor.com/bOm6q.gif")
             return
