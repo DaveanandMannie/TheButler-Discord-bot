@@ -1,7 +1,7 @@
 import sqlite3
 import logging
 
-
+#TODO: figure out to search based on user name and nick name
 class StackNotFoundError(Exception):
 	"""Custom Exception for no stack found"""
 	pass
@@ -134,7 +134,7 @@ class Manager:
 		)
 		return self.cursor.fetchone()
 
-	def get_stack_members(self, *, stack_name: str) -> list[int]:
+	def get_stack_members_ids(self, *, stack_name: str) -> list[int]:
 		try:
 			self.cursor.execute(
 				'''
@@ -152,4 +152,24 @@ class Manager:
 			return discord_ids
 		except sqlite3.Error as error:
 			print(error)
+			raise
+
+	def get_stack_members(self, *, stack_name: str) -> list[str]:
+		"""returns a list of users who belong to the specified mention group."""
+		try:
+			self.cursor.execute(
+				'''
+				SELECT username FROM Users
+				JOIN UserMentionGroups ON Users.id = UserMentionGroups.user_id 
+				JOIN MentionGroups ON UserMentionGroups.group_id = MentionGroups.id 
+				WHERE MentionGroups.name = ?
+				''',
+				(stack_name,))
+			rows = self.cursor.fetchall()
+			if not rows:
+				raise StackNotFoundError
+			users = [row[0] for row in rows]
+			return users
+		except sqlite3.Error as error:
+			self.logger.error(f'an error occurred: {error}')
 			raise

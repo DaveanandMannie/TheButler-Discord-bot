@@ -75,7 +75,7 @@ class GamingStack(Cog):
     async def ping_stack(self, ctx: Context, stack_name: str) -> None:
         """Pings all members in a stack: value-1 -> stack Name"""
         try:
-            member_list: list[int] = self.db.get_stack_members(stack_name=stack_name)
+            member_list: list[int] = self.db.get_stack_members_ids(stack_name=stack_name)
             member: int
             stack_message: str = ''
             for member in member_list:
@@ -91,7 +91,7 @@ class GamingStack(Cog):
             await ctx.send('https://tenor.com/bOm6q.gif')
 
     @command(name='stacks')
-    async def get_all_stacks(self, ctx: Context):
+    async def get_all_stacks(self, ctx: Context) -> None:
         """Shows all stacks"""
         stack_embed: Embed = Embed(
             title="List of of stacks, personally I think they're all bozos",
@@ -99,3 +99,13 @@ class GamingStack(Cog):
             color=discord.Color.purple()
         )
         await ctx.send(embed=stack_embed)
+
+    @command(name='show')
+    async def show_members_stack(self, ctx: Context, stack_name) -> None:
+        """Shows all users in a particular stack: value1: stack name """
+        member_stack_embed: Embed = Embed(
+            title=f'{stack_name}',
+            description='\n'.join(self.db.get_stack_members(stack_name=stack_name)),
+            color=discord.Color.purple()
+        )
+        await ctx.send(embed=member_stack_embed)
