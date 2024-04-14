@@ -63,6 +63,7 @@ class Music(Cog):
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
         self.queue: Queue = Queue(maxsize=7)
+        self.current = None
 
     @command(name='add2q', aliases=['add', 'a2q'])
     async def enqueue(self, ctx: Context, url: str) -> None:
@@ -95,16 +96,26 @@ class Music(Cog):
         embed: Embed = Embed(title="Queue", description=description, color=discord.Colour.purple())
         await ctx.send(embed=embed)
 
+    @command(name="nowplaying", aliases=['np', 'playing', 'track'])
+    async def now_playing(self, ctx: Context):
+        np_embed: Embed = Embed(
+            title='Now playing',
+            description=f'{self.current.title} added by {self.current.requester}.\n{self.current.duration}',
+            color=discord.Colour.purple()
+        )
+        await ctx.send(embed=np_embed)
+
     @command(name='play')
     async def play(self, ctx: [Context, Context.voice_client]):
         if self.queue.empty():
-            time.sleep(120)
+            await asyncio.sleep(120)
             if self.queue.empty():
                 await ctx.send(f'Queue is empty Bozo {ctx.author.mention}')
                 await ctx.send('https://tenor.com/byaam.gif')
                 await ctx.voice_client.disconnect()
                 return
         track = await self.queue.get()
+        self.current = track
         embed: Embed = Embed(
             title='Now playing',
             description=f'{track.title} added by {track.requester}.\n{track.duration}',
