@@ -15,6 +15,7 @@
       <w>preferredcodec</w>
       <w>preferredquality</w>
       <w>restrictfilenames</w>
+      <w>throttledratelimit</w>
       <w>upnext</w>
       <w>ydlp</w>
       <w>ytlp</w>

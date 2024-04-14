@@ -1,6 +1,5 @@
 import asyncio
 from asyncio import Queue
-import os
 import discord
 from discord import PCMVolumeTransformer, FFmpegPCMAudio, Embed, Member, VoiceClient
 from discord.ext.commands import Cog, Bot, command
@@ -55,7 +54,7 @@ class YTSource(PCMVolumeTransformer):
         return cls(FFmpegPCMAudio(filename, **ffmpeg_options), data=data, requester=ctx.author)
 
 
-# TODO: create a separate event loop for url extraction
+# I have no idea why there is a slight audio stutter when adding to queue
 class Music(Cog):
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
@@ -147,28 +146,3 @@ class Music(Cog):
                 await ctx.author.voice.channel.connect()
             else:
                 await ctx.send(f'Join a call you bozo {ctx.author.mention}')
-
-
-# -------------- intent management --------------##
-intents = discord.Intents.default()
-intents.message_content = True
-intents.members = True
-
-# bot config
-# TODO: remove and integrate with main
-butler = Bot(command_prefix='!', intents=intents)
-
-with open(r"E:\Discord\TheButler\secrets.txt") as secrets:
-    for line in secrets:
-        key, value = line.strip().split('=')
-        os.environ[key] = value
-TOKEN: str = os.environ['DISCORD_TOKEN']
-
-
-async def main():
-    async with butler:
-        await butler.add_cog(Music(butler))
-        await butler.start(TOKEN)
-
-
-asyncio.run(main())
