@@ -89,3 +89,12 @@ class GamingStack(Cog):
             error_embed: Embed = Embed(title="That's not a correct stack bozo", color=discord.Color.purple())
             await ctx.send(embed=error_embed)
             await ctx.send('https://tenor.com/bOm6q.gif')
+
+    @command(name='stacks')
+    async def get_all_stacks(self, ctx: Context):
+        stack_embed: Embed = Embed(
+            title="List of of stacks, personally I think they're all bozos",
+            description='\n'.join(self.db.get_mention_names()),
+            color=discord.Color.purple()
+        )
+        await ctx.send(embed=stack_embed)

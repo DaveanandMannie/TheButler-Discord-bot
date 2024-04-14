@@ -88,11 +88,12 @@ class Manager:
 			self.logger.error(f'Failed to create group: {error}')
 			raise
 
-	def get_mention_name(self) -> list[tuple[int, str]]:
+	def get_mention_names(self) -> list[str]:
 		"""Returns a list of Mention Group tuples [(name,)]"""
 		try:
 			self.cursor.execute('SELECT name FROM MentionGroups')
-			mention_groups: list = self.cursor.fetchall()
+			mention_groups_temp: list = self.cursor.fetchall()
+			mention_groups: list[str] = [i[0] for i in mention_groups_temp]
 			return mention_groups
 		except sqlite3.Error as error:
 			self.logger.error(f'An error occurred: {error}')
